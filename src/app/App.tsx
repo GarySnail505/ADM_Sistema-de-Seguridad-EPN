@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import securityLogo from "../assets/logo-seguridad-epn.png";
 import {
   Users, UserPlus, UserMinus, UserCheck, UserX, UserCog,
   Lock, Unlock, Key, Search, Settings, Filter, Download,
@@ -28,7 +29,6 @@ interface FieldDef {
 
 interface UCConfig {
   id: string;
-  isProposed?: boolean;
   section: Section;
   title: string;
   actor: string;
@@ -51,20 +51,13 @@ interface UCConfig {
 
 function EpnShield({ size = 44 }: { size?: number }) {
   return (
-    <svg width={size} height={Math.round(size * 1.18)} viewBox="0 0 44 52" fill="none">
-      <path
-        d="M22 2 L42 11 L42 30 C42 41 33 49 22 51 C11 49 2 41 2 30 L2 11 Z"
-        fill="#14284B" stroke="#D4AF37" strokeWidth="2.5"
-      />
-      <path
-        d="M22 10 L36 17 L36 29 C36 37 29 43 22 45 C15 43 8 37 8 29 L8 17 Z"
-        fill="#B3262D"
-      />
-      <path
-        d="M15 27 L20 32 L30 21"
-        stroke="white" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"
-      />
-    </svg>
+    <img
+      src={securityLogo}
+      alt="Logo del Sistema de Seguridad EPN"
+      width={size}
+      height={Math.round(size * 1.18)}
+      className="object-contain"
+    />
   );
 }
 
@@ -335,37 +328,6 @@ const USE_CASES: UCConfig[] = [
       { name: "changeDescription", label: "Descripción del cambio", type: "textarea", required: true, placeholder: "Justifique el motivo del cambio", fullWidth: true },
     ],
     successMsg: "Parámetro actualizado satisfactoriamente.", errorEmpty: "Debe completar los campos obligatorios.",
-  },
-  {
-    id: "activar-parametro", section: "params", isProposed: true,
-    title: "Activar Parámetro",
-    actor: "Administrador del Sistema",
-    description: "Reactiva un parámetro de configuración que se encuentra inactivo.",
-    icon: <CheckCircle size={28} />, iconBg: "text-green-700 bg-green-50",
-    primaryBtn: "ACTIVAR PARÁMETRO", btnVariant: "green",
-    fields: [
-      { name: "code", label: "Código del parámetro", type: "text", required: true, placeholder: "Ej: MAX_INTENTOS_LOGIN" },
-      { name: "name", label: "Nombre del parámetro", type: "text", placeholder: "Se cargará automáticamente" },
-      { name: "currentStatus", label: "Estado actual", type: "text", placeholder: "INACTIVO" },
-      { name: "reason", label: "Motivo de activación", type: "select", required: true, options: ["Seleccione motivo...", "Reactivación planificada", "Corrección de datos", "Autorización del director", "Restauración del sistema"] },
-    ],
-    successMsg: "Parámetro activado satisfactoriamente.", errorEmpty: "Debe completar los campos obligatorios.",
-  },
-  {
-    id: "desactivar-parametro", section: "params", isProposed: true,
-    title: "Desactivar Parámetro",
-    actor: "Administrador del Sistema",
-    description: "Desactiva un parámetro del sistema sin eliminarlo permanentemente.",
-    icon: <XCircle size={28} />, iconBg: "text-red-600 bg-red-50",
-    primaryBtn: "DESACTIVAR PARÁMETRO", btnVariant: "red",
-    hasModal: true, modalMessage: "¿Está seguro de desactivar este parámetro? Esta acción puede afectar el comportamiento general del sistema.",
-    fields: [
-      { name: "code", label: "Código del parámetro", type: "text", required: true, placeholder: "Ej: MAX_INTENTOS_LOGIN" },
-      { name: "name", label: "Nombre del parámetro", type: "text", placeholder: "Se cargará automáticamente" },
-      { name: "currentStatus", label: "Estado actual", type: "text", placeholder: "ACTIVO" },
-      { name: "reason", label: "Motivo de desactivación", type: "select", required: true, options: ["Seleccione motivo...", "Deprecación del parámetro", "Reemplazado por otro", "Mantenimiento del sistema", "Autorización del director"] },
-    ],
-    successMsg: "Parámetro desactivado satisfactoriamente.", errorEmpty: "Debe completar los campos obligatorios.",
   },
   // AUDITORÍA Y REPORTES
   {
@@ -893,17 +855,11 @@ const SECTIONS: SectionConfig[] = [
 function UCCard({ uc, onClick }: { uc: UCConfig; onClick: () => void }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col hover:shadow-md transition-all group">
-      {uc.isProposed && (
-        <span className="self-start text-[10px] font-bold px-2 py-1 rounded-full mb-3 bg-amber-100 text-amber-800 border border-amber-200">
-          CASO PROPUESTO
-        </span>
-      )}
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-transform group-hover:scale-105 ${uc.iconBg}`}>
         {uc.icon}
       </div>
       <h4 className="font-bold text-sm mb-1 leading-snug" style={{ color: "#14284B" }}>{uc.title}</h4>
       <p className="text-xs leading-relaxed flex-1 mb-2" style={{ color: "#667085" }}>{uc.description}</p>
-      <p className="text-xs mb-3 truncate" style={{ color: "#98A2B3" }}>Actor: {uc.actor.split(" / ")[0]}</p>
       <button
         onClick={onClick}
         className="w-full py-2 rounded-lg text-white text-xs font-bold tracking-wider transition-opacity hover:opacity-90"
@@ -1085,9 +1041,6 @@ function UseCaseFormScreen({ ucId, onBack, onLogout }: {
             </div>
             <div>
               <h2 className="text-xl font-bold leading-tight" style={{ color: "#14284B" }}>{uc.title}</h2>
-              <p className="text-xs mt-0.5" style={{ color: "#667085" }}>
-                Actor responsable: <span className="font-semibold">{uc.actor}</span>
-              </p>
             </div>
           </div>
           <button
