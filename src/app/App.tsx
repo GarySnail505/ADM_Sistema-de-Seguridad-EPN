@@ -28,6 +28,7 @@ interface FieldDef {
 
 interface UCConfig {
   id: string;
+  isProposed?: boolean;
   section: Section;
   title: string;
   actor: string;
@@ -70,11 +71,11 @@ function EpnShield({ size = 44 }: { size?: number }) {
 // ── Mock Data ──────────────────────────────────────────────────────────────────
 
 const MOCK_USERS: Record<string, string>[] = [
-  { "Usuario": "admin.epn", "Correo": "admin@epn.edu.ec", "Estado": "ACTIVO", "Rol": "Administrador", "Último acceso": "05/01/2024" },
-  { "Usuario": "director.administrativo", "Correo": "director@epn.edu.ec", "Estado": "ACTIVO", "Rol": "Director", "Último acceso": "04/01/2024" },
-  { "Usuario": "responsable.interno", "Correo": "r.interno@epn.edu.ec", "Estado": "INACTIVO", "Rol": "Operador", "Último acceso": "02/01/2024" },
-  { "Usuario": "responsable.externo", "Correo": "r.externo@epn.edu.ec", "Estado": "BLOQUEADO", "Rol": "Operador", "Último acceso": "28/12/2023" },
-  { "Usuario": "supervisor.control", "Correo": "supervisor@epn.edu.ec", "Estado": "ACTIVO", "Rol": "Supervisor", "Último acceso": "05/01/2024" },
+  { "Usuario": "admin.epn", "Correo": "admin@epn.edu.ec", "Estado": "ACTIVO", "Rol": "Administrador del Sistema", "Último acceso": "05/07/2026" },
+  { "Usuario": "director.administrativo", "Correo": "director@epn.edu.ec", "Estado": "ACTIVO", "Rol": "Director Administrativo", "Último acceso": "04/07/2026" },
+  { "Usuario": "responsable.interno", "Correo": "r.interno@epn.edu.ec", "Estado": "INACTIVO", "Rol": "Responsable de Personal Interno", "Último acceso": "02/07/2026" },
+  { "Usuario": "responsable.externo", "Correo": "r.externo@epn.edu.ec", "Estado": "BLOQUEADO", "Rol": "Responsable de Personal Externo", "Último acceso": "28/06/2026" },
+  { "Usuario": "guardia.control", "Correo": "guardia@epn.edu.ec", "Estado": "ACTIVO", "Rol": "Guardia de Seguridad", "Último acceso": "05/07/2026" },
 ];
 
 const MOCK_PARAMS: Record<string, string>[] = [
@@ -112,10 +113,24 @@ const USE_CASES: UCConfig[] = [
       { name: "username", label: "Nombre de usuario", type: "text", placeholder: "Ingrese nombre de usuario" },
       { name: "email", label: "Correo electrónico", type: "email", placeholder: "Ingrese correo electrónico" },
       { name: "status", label: "Estado del usuario", type: "select", options: ["Todos", "Activo", "Inactivo", "Bloqueado", "Dado de baja"] },
-      { name: "role", label: "Rol", type: "select", options: ["Todos", "Administrador", "Director", "Operador", "Supervisor"] },
+      { name: "role", label: "Rol", type: "select", options: ["Todos", "Administrador del Sistema", "Director Administrativo", "Responsable de Personal Interno", "Responsable de Personal Externo", "Guardia de Seguridad"] },
       { name: "createdDate", label: "Fecha de creación", type: "date" },
     ],
     successMsg: "Datos consultados correctamente.", errorEmpty: "Ingrese al menos un criterio de búsqueda.",
+  },
+  {
+    id: "cambiar-password-propia", section: "users",
+    title: "Cambiar Contraseña Propia",
+    actor: "Usuario del Sistema",
+    description: "Permite al usuario autenticado actualizar su contraseña de acceso de forma segura.",
+    icon: <Key size={28} />, iconBg: "text-blue-600 bg-blue-50",
+    primaryBtn: "CAMBIAR CONTRASEÑA", btnVariant: "navy",
+    fields: [
+      { name: "currentPassword", label: "Contraseña actual", type: "password", required: true, placeholder: "Ingrese su contraseña actual" },
+      { name: "newPassword", label: "Nueva contraseña", type: "password", required: true, placeholder: "Mínimo 8 caracteres" },
+      { name: "confirmNewPassword", label: "Confirmar nueva contraseña", type: "password", required: true, placeholder: "Repita la nueva contraseña", fullWidth: true },
+    ],
+    successMsg: "Contraseña actualizada satisfactoriamente.", errorEmpty: "Debe completar todos los campos obligatorios.",
   },
   {
     id: "registrar-usuario", section: "users",
@@ -128,7 +143,7 @@ const USE_CASES: UCConfig[] = [
       { name: "username", label: "Nombre de usuario", type: "text", required: true, placeholder: "Ej: usuario.epn" },
       { name: "email", label: "Correo electrónico", type: "email", required: true, placeholder: "Ej: usuario@epn.edu.ec" },
       { name: "person", label: "Persona asociada", type: "text", required: true, placeholder: "Nombre completo" },
-      { name: "role", label: "Rol inicial", type: "select", required: true, options: ["Seleccione un rol...", "Administrador", "Director", "Operador", "Supervisor"] },
+      { name: "role", label: "Rol inicial", type: "select", required: true, options: ["Seleccione un rol...", "Administrador del Sistema", "Director Administrativo", "Responsable de Personal Interno", "Responsable de Personal Externo", "Guardia de Seguridad"] },
       { name: "status", label: "Estado inicial", type: "select", required: true, options: ["Activo", "Inactivo"] },
       { name: "password", label: "Contraseña temporal", type: "password", required: true, placeholder: "Mínimo 8 caracteres" },
       { name: "confirmPassword", label: "Confirmar contraseña temporal", type: "password", required: true, placeholder: "Repita la contraseña" },
@@ -179,7 +194,7 @@ const USE_CASES: UCConfig[] = [
     fields: [
       { name: "search", label: "Buscar usuario", type: "text", required: true, placeholder: "Nombre de usuario" },
       { name: "username", label: "Nombre del usuario", type: "text", required: true, placeholder: "Se cargará automáticamente" },
-      { name: "role", label: "Rol disponible", type: "select", required: true, options: ["Seleccione un rol...", "Administrador", "Director", "Operador", "Supervisor", "Auditor"] },
+      { name: "role", label: "Rol disponible", type: "select", required: true, options: ["Seleccione un rol...", "Administrador del Sistema", "Director Administrativo", "Responsable de Personal Interno", "Responsable de Personal Externo", "Guardia de Seguridad"] },
       { name: "date", label: "Fecha de asignación", type: "date", required: true },
       { name: "observation", label: "Observación", type: "textarea", placeholder: "Motivo o justificación de la asignación", fullWidth: true },
     ],
@@ -195,8 +210,8 @@ const USE_CASES: UCConfig[] = [
     hasModal: true, modalMessage: "¿Está seguro de revocar el rol seleccionado? Esta acción modificará los permisos del usuario de manera inmediata.",
     fields: [
       { name: "search", label: "Buscar usuario", type: "text", required: true, placeholder: "Nombre de usuario" },
-      { name: "activeRoles", label: "Roles activos del usuario", type: "select", required: true, options: ["Seleccione...", "Administrador", "Director", "Operador", "Supervisor", "Auditor"] },
-      { name: "revokeRole", label: "Rol que se desea revocar", type: "select", required: true, options: ["Seleccione...", "Administrador", "Director", "Operador", "Supervisor", "Auditor"] },
+      { name: "activeRoles", label: "Roles activos del usuario", type: "select", required: true, options: ["Seleccione...", "Administrador del Sistema", "Director Administrativo", "Responsable de Personal Interno", "Responsable de Personal Externo", "Guardia de Seguridad"] },
+      { name: "revokeRole", label: "Rol que se desea revocar", type: "select", required: true, options: ["Seleccione...", "Administrador del Sistema", "Director Administrativo", "Responsable de Personal Interno", "Responsable de Personal Externo", "Guardia de Seguridad"] },
       { name: "reason", label: "Motivo de revocación", type: "textarea", required: true, placeholder: "Describa el motivo de la revocación", fullWidth: true },
     ],
     successMsg: "Rol revocado satisfactoriamente.", errorEmpty: "Debe completar los campos obligatorios.",
@@ -322,7 +337,7 @@ const USE_CASES: UCConfig[] = [
     successMsg: "Parámetro actualizado satisfactoriamente.", errorEmpty: "Debe completar los campos obligatorios.",
   },
   {
-    id: "activar-parametro", section: "params",
+    id: "activar-parametro", section: "params", isProposed: true,
     title: "Activar Parámetro",
     actor: "Administrador del Sistema",
     description: "Reactiva un parámetro de configuración que se encuentra inactivo.",
@@ -337,7 +352,7 @@ const USE_CASES: UCConfig[] = [
     successMsg: "Parámetro activado satisfactoriamente.", errorEmpty: "Debe completar los campos obligatorios.",
   },
   {
-    id: "desactivar-parametro", section: "params",
+    id: "desactivar-parametro", section: "params", isProposed: true,
     title: "Desactivar Parámetro",
     actor: "Administrador del Sistema",
     description: "Desactiva un parámetro del sistema sin eliminarlo permanentemente.",
@@ -416,23 +431,23 @@ const USE_CASES: UCConfig[] = [
 function TopBar({ onLogout }: { onLogout: () => void }) {
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 h-20"
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-8 h-20"
       style={{ backgroundColor: "#14284B", borderBottom: "3px solid #D4AF37" }}
     >
       <div className="flex items-center gap-4">
         <EpnShield size={44} />
         <div>
-          <div className="text-white font-bold text-lg leading-tight tracking-wide">
+          <div className="text-white font-bold text-sm sm:text-lg leading-tight tracking-wide">
             Sistema de Seguridad — EPN
           </div>
-          <div className="text-xs leading-tight" style={{ color: "#D4AF37" }}>
-            Control de Acceso Biométrico
+          <div className="text-xs leading-tight hidden sm:block" style={{ color: "#D4AF37" }}>
+            Plataforma Institucional de Seguridad
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-5">
-        <div className="text-right">
-          <div className="text-white font-semibold text-sm">Operador: Admin</div>
+      <div className="flex items-center gap-2 sm:gap-5">
+        <div className="text-right hidden md:block">
+          <div className="text-white font-semibold text-sm">Administrador del Sistema</div>
           <div className="flex items-center justify-end gap-1.5 mt-0.5">
             <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
             <span className="text-xs" style={{ color: "#D8D1A7" }}>En línea</span>
@@ -444,7 +459,7 @@ function TopBar({ onLogout }: { onLogout: () => void }) {
           style={{ backgroundColor: "#B3262D", color: "white", letterSpacing: "0.06em" }}
         >
           <LogOut size={14} />
-          SALIR
+          <span className="hidden sm:inline">SALIR</span>
         </button>
       </div>
     </header>
@@ -677,7 +692,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               <EpnShield size={68} />
             </div>
             <h1 className="text-xl font-bold text-white tracking-wide">Sistema de Seguridad — EPN</h1>
-            <p className="text-sm mt-1.5 font-medium" style={{ color: "#D4AF37" }}>Control de Acceso Biométrico</p>
+            <p className="text-sm mt-1.5 font-medium" style={{ color: "#D4AF37" }}>Plataforma Institucional de Seguridad</p>
           </div>
           {/* Card body */}
           <div className="px-8 py-8">
@@ -732,11 +747,14 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               <p className="text-xs" style={{ color: "#98A2B3" }}>
                 Acceso de demostración: <strong className="text-[#14284B]">admin</strong> / <strong className="text-[#14284B]">admin123</strong>
               </p>
+              <p className="text-xs font-semibold mt-2" style={{ color: "#B3262D" }}>
+                Prototipo académico — Módulo de Administración del Sistema
+              </p>
             </div>
           </div>
         </div>
         <p className="text-center text-xs mt-5" style={{ color: "#98A2B3" }}>
-          Escuela Politécnica Nacional © 2024 — Sistema de Seguridad v2.4.1
+          Escuela Politécnica Nacional © 2026 — Ingeniería de Software I · Periodo 2026-A
         </p>
       </div>
     </div>
@@ -750,27 +768,27 @@ function MainPanelScreen({ onNavigate, onLogout }: { onNavigate: (s: Screen) => 
 
   const modules = [
     {
-      id: "none-1", label: "PERSONAL INTERNO",
+      id: "none-1", label: "GESTIÓN DE PERSONAL INTERNO (GPI)",
       desc: "Gestión de estudiantes, docentes y personal administrativo de la EPN.",
       icon: <Users size={40} />, iconBg: "bg-blue-100 text-blue-700", available: false,
     },
     {
-      id: "none-2", label: "PUNTOS DE CONTROL",
+      id: "none-2", label: "PUNTOS DE CONTROL (PCO)",
       desc: "Administración de zonas, puntos físicos y dispositivos de seguridad.",
       icon: <MapPin size={40} />, iconBg: "bg-indigo-100 text-indigo-700", available: false,
     },
     {
-      id: "none-3", label: "PERSONAL EXTERNO",
+      id: "none-3", label: "GESTIÓN DE PERSONAL EXTERNO (GPE)",
       desc: "Registro y administración de visitantes, proveedores y contratistas.",
       icon: <UserIcon size={40} />, iconBg: "bg-purple-100 text-purple-700", available: false,
     },
     {
-      id: "none-4", label: "CONTROL DE ACCESO",
-      desc: "Validación de ingresos, salidas, credenciales y autorizaciones biométricas.",
+      id: "none-4", label: "CONTROL DE ACCESOS (CAC)",
+      desc: "Validación de ingresos, salidas, credenciales y autorizaciones de acceso.",
       icon: <Lock size={40} />, iconBg: "bg-orange-100 text-orange-700", available: false,
     },
     {
-      id: "admin", label: "ADMINISTRACIÓN DEL SISTEMA",
+      id: "admin", label: "ADMINISTRACIÓN DEL SISTEMA (ADM)",
       desc: "Gestión de usuarios, parámetros, configuración, auditoría y reportes del sistema.",
       icon: <Settings size={40} />, iconBg: "bg-yellow-100 text-yellow-700", available: true,
     },
@@ -779,9 +797,14 @@ function MainPanelScreen({ onNavigate, onLogout }: { onNavigate: (s: Screen) => 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F5F7FA" }}>
       <TopBar onLogout={onLogout} />
-      <main className="pt-28 pb-16 px-8 max-w-7xl mx-auto">
+      <main className="pt-28 pb-16 px-4 sm:px-8 max-w-7xl mx-auto">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold" style={{ color: "#14284B" }}>Panel Principal del Sistema</h2>
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="text-2xl font-bold" style={{ color: "#14284B" }}>Panel Principal del Sistema</h2>
+            <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ backgroundColor: "#FDECEC", color: "#B3262D" }}>
+              PROTOTIPO 2026-A
+            </span>
+          </div>
           <p className="text-sm mt-1" style={{ color: "#667085" }}>
             Seleccione un módulo para acceder. Solo el módulo de Administración del Sistema está disponible en este prototipo.
           </p>
@@ -791,7 +814,7 @@ function MainPanelScreen({ onNavigate, onLogout }: { onNavigate: (s: Screen) => 
             <AlertBox kind="warning" message={unavailMsg} onClose={() => setUnavailMsg("")} />
           </div>
         )}
-        <div className="grid grid-cols-5 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
           {modules.map(m => (
             <div
               key={m.id}
@@ -870,6 +893,11 @@ const SECTIONS: SectionConfig[] = [
 function UCCard({ uc, onClick }: { uc: UCConfig; onClick: () => void }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col hover:shadow-md transition-all group">
+      {uc.isProposed && (
+        <span className="self-start text-[10px] font-bold px-2 py-1 rounded-full mb-3 bg-amber-100 text-amber-800 border border-amber-200">
+          CASO PROPUESTO
+        </span>
+      )}
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-transform group-hover:scale-105 ${uc.iconBg}`}>
         {uc.icon}
       </div>
@@ -895,10 +923,10 @@ function AdminPanelScreen({ onNavigate, onBack, onLogout }: {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F5F7FA" }}>
       <TopBar onLogout={onLogout} />
-      <main className="pt-28 pb-16 px-8 max-w-7xl mx-auto">
+      <main className="pt-28 pb-16 px-4 sm:px-8 max-w-7xl mx-auto">
         <Breadcrumb items={["Inicio", "Administración del Sistema"]} />
         {/* Page header */}
-        <div className="flex items-start justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8">
           <div>
             <h2 className="text-2xl font-bold" style={{ color: "#14284B" }}>Administración del Sistema</h2>
             <p className="text-sm mt-1" style={{ color: "#667085" }}>
@@ -907,7 +935,7 @@ function AdminPanelScreen({ onNavigate, onBack, onLogout }: {
           </div>
           <button
             onClick={onBack}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-colors hover:bg-gray-50 shrink-0 ml-6"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-colors hover:bg-gray-50 shrink-0 md:ml-6 self-start"
             style={{ borderColor: "#D0D5DD", color: "#344054" }}
           >
             <ArrowLeft size={14} />
@@ -916,7 +944,7 @@ function AdminPanelScreen({ onNavigate, onBack, onLogout }: {
         </div>
 
         {/* Quick-nav anchors */}
-        <div className="flex gap-3 mb-8">
+        <div className="flex flex-wrap gap-3 mb-8">
           {SECTIONS.map(s => (
             <a key={s.key} href={`#section-${s.key}`}
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors border"
@@ -932,9 +960,7 @@ function AdminPanelScreen({ onNavigate, onBack, onLogout }: {
         <div className="space-y-10">
           {SECTIONS.map(section => {
             const cards = USE_CASES.filter(u => u.section === section.key);
-            const gridCols = section.key === "users"
-              ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
-              : "grid-cols-2 md:grid-cols-3 lg:grid-cols-5";
+            const gridCols = "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5";
             return (
               <div key={section.key} id={`section-${section.key}`}>
                 {/* Section header bar */}
@@ -942,7 +968,7 @@ function AdminPanelScreen({ onNavigate, onBack, onLogout }: {
                   className="rounded-xl px-6 py-5 mb-5"
                   style={{ backgroundColor: "#14284B", borderLeft: "5px solid #D4AF37" }}
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div>
                       <h3 className="text-base font-bold text-white mb-1">{section.label}</h3>
                       <p className="text-xs leading-relaxed" style={{ color: "#D8D1A7" }}>{section.desc}</p>
@@ -1048,11 +1074,11 @@ function UseCaseFormScreen({ ucId, onBack, onLogout }: {
           onCancel={() => setShowModal(false)}
         />
       )}
-      <main className="pt-28 pb-16 px-8 max-w-4xl mx-auto">
+      <main className="pt-28 pb-16 px-4 sm:px-8 max-w-4xl mx-auto">
         <Breadcrumb items={["Inicio", "Administración del Sistema", sectionLabels[uc.section], uc.title]} />
 
         {/* Header row */}
-        <div className="flex items-start justify-between mb-6">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
           <div className="flex items-start gap-4">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${uc.iconBg}`}>
               {uc.icon}
@@ -1066,7 +1092,7 @@ function UseCaseFormScreen({ ucId, onBack, onLogout }: {
           </div>
           <button
             onClick={onBack}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-colors hover:bg-gray-50 shrink-0 ml-6"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-colors hover:bg-gray-50 shrink-0 md:ml-6 self-start"
             style={{ borderColor: "#D0D5DD", color: "#344054" }}
           >
             <ArrowLeft size={14} />
@@ -1078,7 +1104,7 @@ function UseCaseFormScreen({ ucId, onBack, onLogout }: {
         {alert && <AlertBox kind={alert.kind} message={alert.msg} onClose={() => setAlert(null)} />}
 
         {/* Form card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-8">
           <div className="mb-6 pb-5 border-b border-gray-100">
             <h3 className="font-bold text-base" style={{ color: "#14284B" }}>{uc.title}</h3>
             <p className="text-sm mt-1" style={{ color: "#667085" }}>{uc.description}</p>
@@ -1087,9 +1113,9 @@ function UseCaseFormScreen({ ucId, onBack, onLogout }: {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
             {uc.fields.map(field => (
-              <div key={field.name} className={field.fullWidth ? "col-span-2" : ""}>
+              <div key={field.name} className={field.fullWidth ? "md:col-span-2" : ""}>
                 <FormField field={field} value={values[field.name] || ""} onChange={v => setField(field.name, v)} />
               </div>
             ))}
@@ -1111,7 +1137,7 @@ function UseCaseFormScreen({ ucId, onBack, onLogout }: {
               </button>
               {showAdvanced && (
                 <div className="px-5 pb-5 border-t border-gray-100">
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-4 mt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mt-4">
                     {advFields.map(f => (
                       <FormField key={f.name} field={f} value={values[f.name] || ""} onChange={v => setField(f.name, v)} />
                     ))}
@@ -1130,7 +1156,7 @@ function UseCaseFormScreen({ ucId, onBack, onLogout }: {
           )}
 
           {/* Action buttons */}
-          <div className="flex items-center gap-3 mt-7 pt-5 border-t border-gray-100">
+          <div className="flex flex-wrap items-center gap-3 mt-7 pt-5 border-t border-gray-100">
             <button
               onClick={handleSubmit}
               className={`px-6 py-2.5 rounded-lg font-bold text-sm tracking-wide transition-opacity ${btnCls[uc.btnVariant]}`}
