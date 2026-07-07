@@ -25,6 +25,7 @@ interface FieldDef {
   placeholder?: string;
   helpText?: string;
   fullWidth?: boolean;
+  readOnly?: boolean;
 }
 
 interface UCConfig {
@@ -156,6 +157,7 @@ const USE_CASES: UCConfig[] = [
       { name: "username", label: "Nombre de usuario", type: "text", required: true, placeholder: "usuario.epn" },
       { name: "email", label: "Correo electrónico", type: "email", required: true, placeholder: "usuario@epn.edu.ec" },
       { name: "person", label: "Persona asociada", type: "text", placeholder: "Nombre completo" },
+      { name: "previousRole", label: "Rol anterior", type: "text", placeholder: "Se mostrará al buscar el usuario", helpText: "Rol asignado antes de realizar la actualización.", readOnly: true },
       { name: "status", label: "Estado", type: "select", required: true, options: ["Activo", "Inactivo"] },
       { name: "observation", label: "Observación de modificación", type: "textarea", required: true, placeholder: "Describa el motivo del cambio realizado", fullWidth: true },
     ],
@@ -305,7 +307,7 @@ const USE_CASES: UCConfig[] = [
       { name: "module", label: "Módulo de aplicación", type: "select", required: true, options: ["Seleccione...", "Autenticación", "Sesión", "Seguridad", "General"] },
       { name: "dataType", label: "Tipo de dato", type: "select", required: true, options: ["Seleccione...", "Entero", "Texto", "Booleano", "Decimal", "Fecha"] },
       { name: "value", label: "Valor del parámetro", type: "text", required: true, placeholder: "Valor inicial" },
-      { name: "defaultValue", label: "Valor por defecto", type: "text", placeholder: "Valor predeterminado del sistema" },
+      { name: "registrationDate", label: "Fecha de registro", type: "date", required: true, helpText: "La fecha se completa automáticamente.", readOnly: true },
       { name: "status", label: "Estado inicial", type: "select", required: true, options: ["Activo", "Inactivo"] },
       { name: "editable", label: "Parámetro editable por el administrador", type: "checkbox", fullWidth: true },
     ],
@@ -321,7 +323,6 @@ const USE_CASES: UCConfig[] = [
     fields: [
       { name: "code", label: "Buscar código de parámetro", type: "text", required: true, placeholder: "Ej: MAX_INTENTOS_LOGIN", fullWidth: true },
       { name: "name", label: "Nombre del parámetro", type: "text", placeholder: "Se cargará automáticamente" },
-      { name: "currentValue", label: "Valor actual", type: "text", placeholder: "Se cargará automáticamente" },
       { name: "newValue", label: "Nuevo valor", type: "text", required: true, placeholder: "Ingrese el nuevo valor" },
       { name: "dataType", label: "Tipo de dato", type: "text", placeholder: "Se cargará automáticamente" },
       { name: "module", label: "Módulo", type: "text", placeholder: "Se cargará automáticamente" },
@@ -342,33 +343,8 @@ const USE_CASES: UCConfig[] = [
     fields: [
       { name: "startDate", label: "Fecha inicial", type: "date", required: true },
       { name: "endDate", label: "Fecha final", type: "date", required: true },
-      { name: "user", label: "Usuario", type: "text", placeholder: "Nombre de usuario" },
-      { name: "module", label: "Módulo", type: "select", options: ["Todos", "Gestión Usuarios", "Gestión Parámetros", "Auditoría"] },
-      { name: "action", label: "Acción", type: "select", options: ["Todas", "Registrar", "Actualizar", "Bloquear", "Desbloquear", "Activar", "Desactivar", "Consultar", "Exportar"] },
-      { name: "result", label: "Resultado", type: "select", options: ["Todos", "Éxito", "Error", "Advertencia"] },
-      { name: "entity", label: "Entidad afectada", type: "text", placeholder: "Ej: Usuario, Parámetro" },
-      { name: "ip", label: "Dirección IP", type: "text", placeholder: "Ej: 192.168.1.10" },
     ],
     successMsg: "Bitácora consultada correctamente.", errorEmpty: "Debe completar el rango de fechas.",
-  },
-  {
-    id: "filtrar-bitacora", section: "audit",
-    title: "Filtrar Bitácora",
-    actor: "Administrador del Sistema / Director Administrativo",
-    description: "Aplica filtros avanzados sobre los registros de la bitácora para acotar los resultados.",
-    icon: <Filter size={28} />, iconBg: "text-yellow-600 bg-yellow-50",
-    primaryBtn: "APLICAR FILTROS", btnVariant: "navy",
-    hasTable: true, tableData: MOCK_AUDIT,
-    tableColumns: ["Fecha y hora", "Usuario", "Acción", "Módulo", "Entidad", "Resultado", "IP"],
-    fields: [
-      { name: "date", label: "Fecha específica", type: "date" },
-      { name: "user", label: "Usuario", type: "text", placeholder: "Nombre exacto del usuario" },
-      { name: "module", label: "Módulo", type: "select", options: ["Todos", "Gestión Usuarios", "Gestión Parámetros", "Auditoría"] },
-      { name: "action", label: "Acción", type: "select", options: ["Todas", "Registrar", "Actualizar", "Bloquear", "Consultar", "Exportar"] },
-      { name: "result", label: "Resultado", type: "select", options: ["Todos", "Éxito", "Error", "Advertencia"] },
-      { name: "entity", label: "Entidad afectada", type: "text", placeholder: "Ej: Usuario, Parámetro, Rol" },
-    ],
-    successMsg: "Filtros aplicados correctamente.", errorEmpty: "Seleccione al menos un filtro para aplicar.",
   },
   {
     id: "exportar-reporte", section: "audit",
@@ -519,7 +495,11 @@ function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onCon
 
 function FormField({ field, value, onChange }: { field: FieldDef; value: string; onChange: (v: string) => void }) {
   const [showPw, setShowPw] = useState(false);
-  const base = "w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors focus:border-[#14284B] focus:ring-2 focus:ring-[#14284B]/10 border-gray-200 bg-white";
+  const base = `w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors border-gray-200 ${
+    field.readOnly
+      ? "bg-gray-100 text-gray-600 cursor-not-allowed"
+      : "bg-white focus:border-[#14284B] focus:ring-2 focus:ring-[#14284B]/10"
+  }`;
 
   if (field.type === "checkbox") {
     return (
@@ -579,7 +559,15 @@ function FormField({ field, value, onChange }: { field: FieldDef; value: string;
       <label className="text-sm font-semibold" style={{ color: "#14284B" }}>
         {field.label}{field.required && <span className="text-red-500 ml-1">*</span>}
       </label>
-      <input type={field.type} className={base} placeholder={field.placeholder} value={value} onChange={e => onChange(e.target.value)} />
+      <input
+        type={field.type}
+        className={base}
+        placeholder={field.placeholder}
+        value={value}
+        readOnly={field.readOnly}
+        aria-readonly={field.readOnly}
+        onChange={e => onChange(e.target.value)}
+      />
       {field.helpText && <p className="text-xs" style={{ color: "#667085" }}>{field.helpText}</p>}
     </div>
   );
@@ -915,7 +903,9 @@ function AdminPanelScreen({ onNavigate, onBack, onLogout }: {
         {/* Sections */}
         <div className="space-y-10">
           {SECTIONS.map(section => {
-            const cards = USE_CASES.filter(u => u.section === section.key);
+            const cards = USE_CASES
+              .filter(u => u.section === section.key)
+              .sort((a, b) => Number(b.title.startsWith("Registrar")) - Number(a.title.startsWith("Registrar")));
             const gridCols = "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5";
             return (
               <div key={section.key} id={`section-${section.key}`}>
@@ -960,7 +950,14 @@ function UseCaseFormScreen({ ucId, onBack, onLogout }: {
   onLogout: () => void;
 }) {
   const uc = USE_CASES.find(u => u.id === ucId)!;
-  const [values, setValues] = useState<Record<string, string>>({});
+  const [values, setValues] = useState<Record<string, string>>(() => {
+    if (ucId !== "registrar-parametro") return {};
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return { registrationDate: `${year}-${month}-${day}` };
+  });
   const [alert, setAlert] = useState<{ kind: AlertKind; msg: string } | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showTable, setShowTable] = useState(false);
@@ -1012,13 +1009,41 @@ function UseCaseFormScreen({ ucId, onBack, onLogout }: {
 
   // Advanced filter fields shown inside consultar-bitacora
   const advFields: FieldDef[] = [
-    { name: "adv_date", label: "Fecha específica", type: "date" },
-    { name: "adv_user", label: "Usuario exacto", type: "text", placeholder: "Nombre de usuario" },
+    { name: "adv_user", label: "Usuario", type: "text", placeholder: "Nombre de usuario o correo" },
     { name: "adv_module", label: "Módulo", type: "select", options: ["Todos", "Gestión Usuarios", "Gestión Parámetros", "Auditoría"] },
-    { name: "adv_action", label: "Acción", type: "select", options: ["Todas", "Registrar", "Actualizar", "Bloquear", "Consultar", "Exportar"] },
+    { name: "adv_action", label: "Acción realizada", type: "select", options: ["Todas", "Registrar", "Actualizar", "Resetear contraseña", "Asignar rol", "Revocar rol", "Bloquear", "Desbloquear", "Activar", "Dar de baja", "Consultar", "Exportar"] },
     { name: "adv_entity", label: "Entidad afectada", type: "text", placeholder: "Ej: Usuario, Parámetro" },
     { name: "adv_result", label: "Resultado", type: "select", options: ["Todos", "Éxito", "Error", "Advertencia"] },
+    { name: "adv_ip", label: "Dirección IP de origen", type: "text", placeholder: "Ej: 192.168.1.10" },
   ];
+
+  const activeAdvancedFilters = advFields.filter(field => {
+    const value = (values[field.name] || "").trim();
+    return value !== "" && value !== "Todos" && value !== "Todas";
+  }).length;
+
+  function applyAdvancedFilters() {
+    if (!allRequiredFilled()) {
+      setAlert({ kind: "error", msg: uc.errorEmpty });
+      return;
+    }
+    setShowTable(true);
+    setAlert({
+      kind: "success",
+      msg: activeAdvancedFilters > 0
+        ? `Filtros avanzados aplicados correctamente (${activeAdvancedFilters} activos).`
+        : "Consulta realizada con el rango de fechas seleccionado.",
+    });
+  }
+
+  function clearAdvancedFilters() {
+    setValues(previous => {
+      const next = { ...previous };
+      advFields.forEach(field => delete next[field.name]);
+      return next;
+    });
+    setAlert(null);
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F5F7FA" }}>
@@ -1076,33 +1101,57 @@ function UseCaseFormScreen({ ucId, onBack, onLogout }: {
 
           {/* Advanced filters collapsible for consultar-bitacora */}
           {uc.id === "consultar-bitacora" && (
-            <div className="mt-6 rounded-xl border border-dashed border-gray-300 overflow-hidden">
+            <div className="mt-6 rounded-xl border border-gray-200 overflow-hidden bg-gray-50/60">
               <button
+                type="button"
                 onClick={() => setShowAdvanced(s => !s)}
-                className="w-full flex items-center justify-between px-5 py-3.5 text-sm font-bold transition-colors hover:bg-gray-50"
+                className="w-full flex items-center justify-between px-5 py-4 text-sm font-bold transition-colors hover:bg-gray-100/70"
                 style={{ color: "#14284B" }}
               >
-                <span className="flex items-center gap-2">
-                  <Filter size={14} />
-                  FILTROS AVANZADOS
+                <span className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
+                    <Filter size={15} />
+                  </span>
+                  <span className="text-left">
+                    <span className="block">FILTROS AVANZADOS</span>
+                    <span className="block text-xs font-normal mt-0.5" style={{ color: "#667085" }}>
+                      Acote la búsqueda por usuario, acción, resultado, entidad o IP
+                    </span>
+                  </span>
+                  {activeAdvancedFilters > 0 && (
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#D4AF37", color: "#14284B" }}>
+                      {activeAdvancedFilters} activos
+                    </span>
+                  )}
                 </span>
                 {showAdvanced ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               </button>
               {showAdvanced && (
-                <div className="px-5 pb-5 border-t border-gray-100">
+                <div className="px-5 pb-5 border-t border-gray-200 bg-white">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mt-4">
                     {advFields.map(f => (
                       <FormField key={f.name} field={f} value={values[f.name] || ""} onChange={v => setField(f.name, v)} />
                     ))}
                   </div>
-                  <button
-                    onClick={() => setAlert({ kind: "success", msg: "Filtros aplicados correctamente." })}
-                    className="mt-5 flex items-center gap-2 px-5 py-2.5 rounded-lg border text-sm font-bold transition-colors hover:bg-gray-50"
-                    style={{ borderColor: "#14284B", color: "#14284B" }}
-                  >
-                    <Filter size={13} />
-                    APLICAR FILTROS
-                  </button>
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={applyAdvancedFilters}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-opacity hover:opacity-90"
+                      style={{ backgroundColor: "#14284B" }}
+                    >
+                      <Filter size={13} />
+                      APLICAR FILTROS
+                    </button>
+                    <button
+                      type="button"
+                      onClick={clearAdvancedFilters}
+                      className="px-5 py-2.5 rounded-lg border text-sm font-semibold transition-colors hover:bg-gray-50"
+                      style={{ borderColor: "#D0D5DD", color: "#344054" }}
+                    >
+                      LIMPIAR FILTROS
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -1117,7 +1166,7 @@ function UseCaseFormScreen({ ucId, onBack, onLogout }: {
               {uc.primaryBtn}
             </button>
             <button
-              onClick={() => { setValues({}); setAlert(null); setShowTable(false); setShowAdvanced(false); }}
+              onClick={onBack}
               className="px-6 py-2.5 rounded-lg border text-sm font-semibold transition-colors hover:bg-gray-50"
               style={{ borderColor: "#D0D5DD", color: "#344054" }}
             >
