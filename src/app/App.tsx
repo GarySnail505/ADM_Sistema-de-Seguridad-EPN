@@ -215,7 +215,7 @@ const USE_CASES: UCConfig[] = [
     id: "bloquear-usuario", section: "users",
     title: "Bloquear Usuario",
     actor: "Administrador del Sistema",
-    description: "Bloquea temporalmente una cuenta de usuario por razones de seguridad institucional.",
+    description: "Bloquea temporal o indefinidamente una cuenta de usuario por razones de seguridad institucional.",
     icon: <Lock size={28} />, iconBg: "text-red-600 bg-red-50",
     primaryBtn: "BLOQUEAR USUARIO", btnVariant: "red",
     fields: [
@@ -261,10 +261,10 @@ const USE_CASES: UCConfig[] = [
     id: "dar-baja-usuario", section: "users",
     title: "Dar de Baja Usuario",
     actor: "Administrador del Sistema",
-    description: "Deshabilita permanentemente una cuenta de usuario sin eliminar su historial.",
+    description: "Da de baja lógicamente una cuenta de usuario sin eliminar su historial.",
     icon: <UserMinus size={28} />, iconBg: "text-red-600 bg-red-50",
     primaryBtn: "DAR DE BAJA", btnVariant: "red",
-    hasModal: true, modalMessage: "Esta acción deshabilitará la cuenta de forma permanente, pero conservará su historial de actividad. ¿Desea continuar?",
+    hasModal: true, modalMessage: "Esta acción dará de baja lógicamente la cuenta, pero conservará su historial de actividad. ¿Desea continuar?",
     fields: [
       { name: "search", label: "Buscar usuario", type: "text", required: true, placeholder: "Nombre de usuario" },
       { name: "currentStatus", label: "Estado actual", type: "text", placeholder: "Se cargará automáticamente" },
@@ -675,14 +675,11 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                   </button>
                 </div>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
                   <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} className="w-4 h-4 accent-[#14284B]" />
                   <span className="text-sm" style={{ color: "#344054" }}>Recordar sesión</span>
                 </label>
-                <button className="text-sm font-semibold hover:underline" style={{ color: "#14284B" }}>
-                  ¿Olvidó su contraseña?
-                </button>
               </div>
             </div>
             <button
